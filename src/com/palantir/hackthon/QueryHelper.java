@@ -9,9 +9,10 @@ import java.util.Map;
  *
  * @author Jian Fang (jfang@rocketfuelinc.com)
  */
-public class Util {
+public class QueryHelper {
     public static Map<String, List<DataItem>> readFromOffsets(String fileName, long beginOffset, long endOffset)
             throws IOException{
         return null;
     }
+    
 }
