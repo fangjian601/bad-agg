@@ -148,7 +148,11 @@ public class QueryHelper {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return resultMap;
-		}	
+		}
+
+        for(Map.Entry<String, List<DataItem>> entry : resultMap.entrySet()){
+            Collections.sort(entry.getValue());
+        }
     	
         return resultMap;
     }
