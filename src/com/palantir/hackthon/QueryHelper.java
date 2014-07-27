@@ -66,19 +66,6 @@ public class QueryHelper {
         return index - 1;
     }
 
-    public static Map<String, Integer> precomputedComputeRangeMax(Map<String, List<DataItem>> data, int startAge, int endAge) {
-        Map<String,Integer> countsByState = new HashMap<String, Integer>();
-        Iterator<Map.Entry<String, List<DataItem>>> it = data.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, List<DataItem>> stateData = it.next();
-            int left = bsearchLeft(startAge, stateData.getValue());
-            int right = bsearchRight(endAge, stateData.getValue());
-            countsByState.put(stateData.getKey(), right-left + 1);
-        }
-
-        return countsByState;
-    }
-
     public static Map<String, List<DataItem>> readFromOffsets(String fileName, long beginOffset, long endOffset){
 
     	Map<String, List<DataItem>> resultMap = new HashMap<String, List<DataItem>>();
@@ -169,23 +156,39 @@ public class QueryHelper {
         return (int)(sum / count);
     }
 
-    public static Map<String, Integer> rangeMaxQuery(List<List<String>> data, int startAge, int endAge) {
+    public static Map<String, Integer> rangeMaxQuery(Map<String, List<DataItem>> data,
+            int startAge, int endAge) {
         Map<String,Integer> countsByState = new HashMap<String, Integer>();
-        for (List<String> row : data) {
-            int age = Integer.parseInt(row.get(1));
-            String state = row.get(2);
-            if (age >= startAge && age <= endAge) {
-                Integer count = countsByState.get(state);
-                if (count != null) {
-                    countsByState.put(state, count + 1);
-                } else {
-                    countsByState.put(state, 1);
-                }
-            }
+        Iterator<Map.Entry<String, List<DataItem>>> it = data.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, List<DataItem>> stateData = it.next();
+            int left = bsearchLeft(startAge, stateData.getValue());
+            int right = bsearchRight(endAge, stateData.getValue());
+            countsByState.put(stateData.getKey(), right-left + 1);
         }
 
         return countsByState;
     }
 
-
+    public static String rangeMaxQueryAggregate(List<Map<String, Integer>> results){
+        Map<String, Integer> temp = new HashMap<String, Integer>();
+        String maxState = null;
+        int maxCount = 0;
+        for(Map<String, Integer> result : results){
+            for(Map.Entry<String, Integer> entry : result.entrySet()){
+                Integer count = temp.get(entry.getKey());
+                if(count == null){
+                    count = entry.getValue();
+                } else {
+                    count = count + entry.getValue();
+                }
+                if(count > maxCount){
+                    maxCount = count;
+                    maxState = entry.getKey();
+                }
+                temp.put(entry.getKey(), count);
+            }
+        }
+        return maxState;
+    }
 }

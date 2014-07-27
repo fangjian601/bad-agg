@@ -3,6 +3,7 @@ package com.palantir.hackthon;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,5 +41,19 @@ public class QueryCoordinator {
             results.add((List<Long>)(resultList.poll()));
         }
         return QueryHelper.averageQueryAggregate(results);
+    }
+
+    public String rangeMax(String startAge, String endAge){
+        List<Map<String, Integer>> results = new ArrayList<Map<String, Integer>>();
+        int counter = workers.length;
+        for(QueryWorker worker : workers){
+            worker.setQueryType("rangemax");
+            worker.setQueryParameters(new String[]{startAge, endAge});
+            pool.execute(worker);
+        }
+        while(counter != 0){
+            results.add((Map<String, Integer>)(resultList.poll()));
+        }
+        return QueryHelper.rangeMaxQueryAggregate(results);
     }
 }

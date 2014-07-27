@@ -36,11 +36,13 @@ public class QueryWorker implements Runnable {
     public void run() {
         Object result = null;
         if(queryType.toLowerCase().equals("average")){
-
+            resultList.offer(QueryHelper.averageQuery(data, queryParameters.get(0)));
         } else if(queryType.toLowerCase().equals("top10")){
 
         } else if(queryType.toLowerCase().equals("rangemax")){
-
+            int startAge = Integer.valueOf(queryParameters.get(0));
+            int endAge = Integer.valueOf(queryParameters.get(1));
+            resultList.offer(QueryHelper.rangeMaxQuery(data, startAge, endAge));
         }
         if(result != null) {resultList.offer(result);}
     }
