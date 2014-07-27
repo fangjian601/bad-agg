@@ -1,6 +1,7 @@
 package com.palantir.hackthon;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class QueryWorker implements Runnable {
     }
 
     public void setQueryParameters(String[] queryParameters) {
-        this.queryParameters.clear();
+        this.queryParameters = new ArrayList<String>();
         Collections.addAll(this.queryParameters, queryParameters);
     }
 
@@ -38,7 +39,8 @@ public class QueryWorker implements Runnable {
         if(queryType.toLowerCase().equals("average")){
             resultList.offer(QueryHelper.averageQuery(data, queryParameters.get(0)));
         } else if(queryType.toLowerCase().equals("top10")){
-
+            List<DataItem> items = data.get(queryParameters.get(0));
+            resultList.offer(QueryHelper.top10Query(items));
         } else if(queryType.toLowerCase().equals("rangemax")){
             int startAge = Integer.valueOf(queryParameters.get(0));
             int endAge = Integer.valueOf(queryParameters.get(1));

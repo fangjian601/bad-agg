@@ -16,7 +16,7 @@ public class BadAgg {
                 if (command[0].equalsIgnoreCase("average")) {
                     System.out.println(coordinator.average(command[1]));
                 } else if (command[0].equalsIgnoreCase("top10")) {
-
+                    System.out.println(coordinator.top10(command[1]));
                 } else if (command[0].equalsIgnoreCase("rangemax")) {
                     System.out.println(coordinator.rangeMax(command[1], command[2]));
                 } else {

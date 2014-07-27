@@ -43,6 +43,20 @@ public class QueryCoordinator {
         return QueryHelper.averageQueryAggregate(results);
     }
 
+    public List<String> top10(String state){
+        List<List<DataItem>> results = new ArrayList<List<DataItem>>();
+        int counter = workers.length;
+        for(QueryWorker worker : workers){
+            worker.setQueryType("top10");
+            worker.setQueryParameters(new String[]{state});
+            pool.execute(worker);
+        }
+        while(counter != 0){
+            results.add((List<DataItem>)(resultList.poll()));
+        }
+        return QueryHelper.top10QueryAggregate(results);
+    }
+
     public String rangeMax(String startAge, String endAge){
         List<Map<String, Integer>> results = new ArrayList<Map<String, Integer>>();
         int counter = workers.length;
