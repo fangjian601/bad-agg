@@ -38,7 +38,12 @@ public class QueryCoordinator {
             pool.execute(worker);
         }
         while(counter != 0){
-            results.add((List<Long>)(resultList.poll()));
+            try {
+                results.add((List<Long>)(resultList.take()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            counter--;
         }
         return QueryHelper.averageQueryAggregate(results);
     }
@@ -52,7 +57,12 @@ public class QueryCoordinator {
             pool.execute(worker);
         }
         while(counter != 0){
-            results.add((List<DataItem>)(resultList.poll()));
+            try {
+                results.add((List<DataItem>)(resultList.take()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            counter--;
         }
         return QueryHelper.top10QueryAggregate(results);
     }
@@ -66,7 +76,12 @@ public class QueryCoordinator {
             pool.execute(worker);
         }
         while(counter != 0){
-            results.add((Map<String, Integer>)(resultList.poll()));
+            try {
+                results.add((Map<String, Integer>)(resultList.take()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            counter--;
         }
         return QueryHelper.rangeMaxQueryAggregate(results);
     }

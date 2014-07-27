@@ -146,6 +146,8 @@ public class QueryHelper {
     			curPointer = file.getFilePointer();
     		}
 
+            file.close();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return resultMap;
@@ -198,8 +200,11 @@ public class QueryHelper {
         long sum = 0, count = 0;
         for(List<Long> agesCount : agesCounts){
             for(int i = 0; i < agesCount.size(); i++){
-                count += agesCount.get(i);
-                sum += (i * agesCount.get(i));
+                Long ageCount = agesCount.get(i);
+                if(ageCount != null){
+                    count += ageCount;
+                    sum += (i * ageCount);
+                }
             }
         }
         return (int)(sum / count);
