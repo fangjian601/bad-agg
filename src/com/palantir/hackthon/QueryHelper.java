@@ -1,11 +1,8 @@
 package com.palantir.hackthon;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +23,8 @@ public class QueryHelper {
     	Map<String, List<DataItem>> resultMap = new HashMap<String, List<DataItem>>();
     	
     	try {
-    		RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+    		@SuppressWarnings("resource")
+			RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
     		
     		long realStart;
     		// Check to see if the 1st of the line
