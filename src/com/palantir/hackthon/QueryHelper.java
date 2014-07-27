@@ -44,7 +44,7 @@ public class QueryHelper {
     		long curPointer = file.getFilePointer();
     		while (curPointer <= endOffset) {
     			String curLine = file.readLine();
-    			if (curLine.length() == 0) break;
+    			if (curLine == null || curLine.length() == 0) break;
     			
     			// Process
     			String[] strings = curLine.split(DELIM);
@@ -62,20 +62,22 @@ public class QueryHelper {
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return resultMap;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return resultMap;
 		}	
     	
         return resultMap;
     }
     
-    public static void main(String[] args) throws IOException {
-    	String fileName = "10";
+    public static void main(String[] args) {
+    	String fileName = "1million";
     	long start = 8;
-    	long end = 30;
+    	long end = 10000000;
     	
-		RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-		
+//		RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
+//		
 //		file.seek(start);
 //		String startTempLine = file.readLine();
 //		System.err.println("start pointer at: " + startTempLine.charAt(0));
@@ -86,6 +88,10 @@ public class QueryHelper {
 		
 		Map<String, List<DataItem>> map = readFromOffsets(fileName, start, end);
 		System.out.println(map.size());
+		
+		for (String string : map.keySet()) {
+			System.out.println(string + ", " + map.get(string).size());
+		}
 		
 		
     }
