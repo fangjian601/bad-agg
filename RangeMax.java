@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -82,11 +83,31 @@ public class RangeMax {
 	        Map.Entry<String, List<DataItem>> stateData = (Entry<String, List<DataItem>>)it.next();
 	        int left = bsearchLeft(startAge, stateData.getValue());
 	        int right = bsearchRight(endAge, stateData.getValue());
-	        countsByState.put(stateData.getKey(), right-left);
+	        countsByState.put(stateData.getKey(), right-left + 1);
 	        
 //	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 	    
 	    return countsByState;
+	}
+	
+	public static void main(String[] args) {
+		Map<String, List<DataItem>> data = new HashMap<String, List<DataItem>>();
+		List<DataItem> l = new ArrayList<DataItem>();
+		l.add(new DataItem("Bob", 2, "CA"));
+		l.add(new DataItem("B", 10, "CA"));
+		l.add(new DataItem("Bo", 10, "CA"));
+		l.add(new DataItem("Bill", 10, "CA"));
+		l.add(new DataItem("A", 15, "CA"));
+		l.add(new DataItem("Bc", 20, "CA"));
+		l.add(new DataItem("C", 25, "CA"));
+		l.add(new DataItem("D", 25, "CA"));
+		l.add(new DataItem("E", 25, "CA"));
+		l.add(new DataItem("F", 25, "CA"));
+		l.add(new DataItem("G", 25, "CA"));
+		l.add(new DataItem("H", 26, "CA"));
+		data.put("CA", l);
+		System.out.println(precomputedComputeRangeMax(data, 10, 25).get("CA"));
+		
 	}
 }
