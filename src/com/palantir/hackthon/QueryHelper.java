@@ -112,13 +112,17 @@ public class QueryHelper {
     		
     		long realStart;
     		// Check to see if the 1st of the line
-    		file.seek(beginOffset - 1);
-    		String line = file.readLine();
-    		if (line.length() == 0) {
-    			realStart = beginOffset;
+    		if (beginOffset == 0) {
+        		file.seek(beginOffset - 1);
+        		String line = file.readLine();
+        		if (line.length() == 0) {
+        			realStart = beginOffset;
+        		} else {
+        			long temp = file.getFilePointer();
+        			realStart = temp;
+        		}
     		} else {
-    			long temp = file.getFilePointer();
-    			realStart = temp;
+    			realStart = 0;
     		}
     		file.seek(realStart);
     		
