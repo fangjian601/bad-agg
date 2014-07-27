@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +19,66 @@ import java.util.Map;
 public class QueryHelper {
 	
 	static final String DELIM = ",";
-	
+
+    private static int bsearchLeft(int age, List<DataItem> l){
+        if (age < 0) {
+            return -1;
+        }
+
+        int lo = 0;
+        int hi = l.size() - 1;
+        int mid = 0;
+        while (lo <= hi) {
+            // Key is in a[lo..hi] or not present.
+            mid = lo + ((hi - lo) >>> 1);
+            if      (age < l.get(mid).getAge()) hi = mid - 1;
+            else if (age > l.get(mid).getAge()) lo = mid + 1;
+            else break;
+        }
+
+        int index = mid;
+        while (index >= 0 && age == l.get(index).getAge()) {
+            index--;
+        }
+        return index + 1;
+    }
+
+    private static int bsearchRight(int age, List<DataItem> l){
+        if (age < 0) {
+            return -1;
+        }
+
+        int lo = 0;
+        int hi = l.size() - 1;
+        int mid = 0;
+        while (lo <= hi) {
+            // Key is in a[lo..hi] or not present.
+            mid = lo + ((hi - lo) >>> 1);
+            if      (age < l.get(mid).getAge()) hi = mid - 1;
+            else if (age > l.get(mid).getAge()) lo = mid + 1;
+            else break;
+        }
+
+        int index = mid;
+        while (index < l.size() && age == l.get(index).getAge()) {
+            index++;
+        }
+        return index - 1;
+    }
+
+    public static Map<String, Integer> precomputedComputeRangeMax(Map<String, List<DataItem>> data, int startAge, int endAge) {
+        Map<String,Integer> countsByState = new HashMap<String, Integer>();
+        Iterator<Map.Entry<String, List<DataItem>>> it = data.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, List<DataItem>> stateData = it.next();
+            int left = bsearchLeft(startAge, stateData.getValue());
+            int right = bsearchRight(endAge, stateData.getValue());
+            countsByState.put(stateData.getKey(), right-left + 1);
+        }
+
+        return countsByState;
+    }
+
     public static Map<String, List<DataItem>> readFromOffsets(String fileName, long beginOffset, long endOffset){
 
     	Map<String, List<DataItem>> resultMap = new HashMap<String, List<DataItem>>();
@@ -68,29 +129,63 @@ public class QueryHelper {
     	
         return resultMap;
     }
-    
-    public static void main(String[] args) {
-    	String fileName = "1million";
-    	long start = 8;
-    	long end = 10000000;
-    	
-//		RandomAccessFile file = new RandomAccessFile(new File(fileName), "r");
-//		
-//		file.seek(start);
-//		String startTempLine = file.readLine();
-//		System.err.println("start pointer at: " + startTempLine.charAt(0));
-//		
-//		file.seek(end);
-//		String endTempLine = file.readLine();
-//		System.err.println("end pointer at: " + endTempLine.charAt(0));
-		
-		Map<String, List<DataItem>> map = readFromOffsets(fileName, start, end);
-		System.out.println(map.size());
-		
-		for (String string : map.keySet()) {
-			System.out.println(string + ", " + map.get(string).size());
-		}
-		
-		
+
+    public static List<Long> splitFile(String fileName, int num){
+        List<Long> result = new ArrayList<Long>();
+        File file = new File(fileName);
+        long fileSize = file.length();
+        if(fileSize <= num){
+            result.add(0l);
+        } else {
+            long size = fileSize / num;
+            for(long offset = 0; offset < fileSize; offset += size){
+                result.add(offset);
+            }
+        }
+        result.add(fileSize - 1);
+        return result;
     }
+
+    public static List<Long> averageQuery(Map<String, List<DataItem>> data, String prefix){
+        Long[] result = new Long[100];
+        for (Map.Entry<String, List<DataItem>> entry : data.entrySet()){
+            for(DataItem item : entry.getValue()){
+                if(item.getName().startsWith(prefix) && item.getAge() >=0 && item.getAge() < 100){
+                    result[item.getAge()] = result[item.getAge()] + 1;
+                }
+            }
+        }
+        return Arrays.asList(result);
+    }
+
+    public static int averageQueryAggregate(List<List<Long>> agesCounts){
+        long sum = 0, count = 0;
+        for(List<Long> agesCount : agesCounts){
+            for(int i = 0; i < agesCount.size(); i++){
+                count += agesCount.get(i);
+                sum += (i * agesCount.get(i));
+            }
+        }
+        return (int)(sum / count);
+    }
+
+    public static Map<String, Integer> rangeMaxQuery(List<List<String>> data, int startAge, int endAge) {
+        Map<String,Integer> countsByState = new HashMap<String, Integer>();
+        for (List<String> row : data) {
+            int age = Integer.parseInt(row.get(1));
+            String state = row.get(2);
+            if (age >= startAge && age <= endAge) {
+                Integer count = countsByState.get(state);
+                if (count != null) {
+                    countsByState.put(state, count + 1);
+                } else {
+                    countsByState.put(state, 1);
+                }
+            }
+        }
+
+        return countsByState;
+    }
+
+
 }
