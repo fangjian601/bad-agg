@@ -13,6 +13,9 @@ import java.util.concurrent.BlockingQueue;
  * @author Jian Fang (jfang@rocketfuelinc.com)
  */
 public class QueryWorker implements Runnable {
+    private String fileName;
+    private long beginOffset;
+    private long endOffset;
     private String queryType;
     private List<String> queryParameters;
     private Map<String, List<DataItem>> data;
@@ -20,7 +23,10 @@ public class QueryWorker implements Runnable {
 
     public QueryWorker(String fileName, long beginOffset, long endOffset, BlockingQueue<Object> resultList)
             throws IOException{
-        this.data = QueryHelper.readFromOffsets(fileName, beginOffset, endOffset);
+        this.data = null;
+        this.fileName = fileName;
+        this.beginOffset = beginOffset;
+        this.endOffset = endOffset;
         this.resultList = resultList;
     }
 
@@ -36,6 +42,9 @@ public class QueryWorker implements Runnable {
     @Override
     public void run() {
         Object result = null;
+        if(data == null){
+            data = QueryHelper.readFromOffsets(fileName, beginOffset, endOffset);
+        }
         if(queryType.toLowerCase().equals("average")){
             resultList.offer(QueryHelper.averageQuery(data, queryParameters.get(0)));
         } else if(queryType.toLowerCase().equals("top10")){
