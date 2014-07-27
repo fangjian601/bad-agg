@@ -112,7 +112,7 @@ public class QueryHelper {
     		
     		long realStart;
     		// Check to see if the 1st of the line
-    		if (beginOffset == 0) {
+    		if (beginOffset != 0) {
         		file.seek(beginOffset - 1);
         		String line = file.readLine();
         		if (line.length() == 0) {
@@ -173,7 +173,7 @@ public class QueryHelper {
                 result.add(offset);
             }
         }
-        result.add(fileSize - 1);
+        result.add(fileSize);
         return result;
     }
 
@@ -181,8 +181,13 @@ public class QueryHelper {
         Long[] result = new Long[100];
         for (Map.Entry<String, List<DataItem>> entry : data.entrySet()){
             for(DataItem item : entry.getValue()){
-                if(item.getName().startsWith(prefix) && item.getAge() >=0 && item.getAge() < 100){
-                    result[item.getAge()] = result[item.getAge()] + 1;
+                int age = item.getAge();
+                if(item.getName().startsWith(prefix) && age >=0 && age < 100){
+                    if(result[age] == null){
+                        result[age] = 1l;
+                    } else {
+                        result[age] = result[item.getAge()] + 1;
+                    }
                 }
             }
         }

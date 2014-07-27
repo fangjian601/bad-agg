@@ -21,11 +21,11 @@ public class QueryCoordinator {
 
     public QueryCoordinator(int workerNum, String fileName) throws IOException {
         List<Long> startOffsets = QueryHelper.splitFile(fileName, workerNum);
+        resultList = new LinkedBlockingDeque<Object>();
         workers = new QueryWorker[startOffsets.size() - 1];
         for(int i = 0; i < startOffsets.size() - 1; i++){
             workers[i] = new QueryWorker(fileName, startOffsets.get(i), startOffsets.get(i + 1) - 1, resultList);
         }
-        resultList = new LinkedBlockingDeque<Object>();
         pool = Executors.newFixedThreadPool(workers.length);
     }
 

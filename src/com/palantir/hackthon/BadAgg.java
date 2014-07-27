@@ -9,7 +9,7 @@ public class BadAgg {
     public static void main(String[] args) {
         try {
             Scanner sc = new Scanner(System.in);
-            QueryCoordinator coordinator = new QueryCoordinator(32, sc.nextLine());
+            QueryCoordinator coordinator = new QueryCoordinator(1, sc.nextLine());
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
                 String [] command = br.readLine().split(" ");

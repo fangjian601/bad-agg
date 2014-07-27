@@ -41,7 +41,6 @@ public class QueryWorker implements Runnable {
 
     @Override
     public void run() {
-        Object result = null;
         if(data == null){
             data = QueryHelper.readFromOffsets(fileName, beginOffset, endOffset);
         }
@@ -55,6 +54,5 @@ public class QueryWorker implements Runnable {
             int endAge = Integer.valueOf(queryParameters.get(1));
             resultList.offer(QueryHelper.rangeMaxQuery(data, startAge, endAge));
         }
-        if(result != null) {resultList.offer(result);}
     }
 }
